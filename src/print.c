@@ -140,6 +140,13 @@ void print_file_matches(const char *path, const char *buf, const size_t buf_len,
         }
 
         if (buf[i] == '\n' || i == buf_len) {
+            /* skip lines longer than 350 characters */
+            if (i - prev_line_offset > 350) {
+                prev_line_offset = i + 1; /* skip the newline */
+                line++;
+                fprintf(out_fd, "[skipped line >%d chars]\n", 350);
+                continue;
+            }
             if (lines_since_last_match == 0) {
                 if (opts.print_path == PATH_PRINT_EACH_LINE && !opts.search_stream) {
                     print_path(path, ':');
