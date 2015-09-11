@@ -91,6 +91,7 @@ void print_file_matches(const char *path, const char *buf, const size_t buf_len,
 
     context_prev_lines = ag_calloc(sizeof(char *), (opts.before + 1));
 
+    int printed_skip = 0;
     for (i = 0; i <= buf_len && (cur_match < matches_len || lines_since_last_match <= opts.after); i++) {
         if (cur_match < matches_len && i == matches[cur_match].start) {
             in_a_match = TRUE;
@@ -144,7 +145,10 @@ void print_file_matches(const char *path, const char *buf, const size_t buf_len,
             if (i - prev_line_offset > 350) {
                 prev_line_offset = i + 1; /* skip the newline */
                 line++;
-                fprintf(out_fd, "[skipped line >%d chars]\n", 350);
+                if (! printed_skip) {
+                    fprintf(out_fd, "[skipped line >%d chars]\n", 350);
+                    printed_skip = 1;
+                }
                 continue;
             }
             if (lines_since_last_match == 0) {
